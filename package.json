@@ -1,0 +1,14 @@
+{
+  "name": "cardapio",
+  "version": "1.0.0",
+  "description": "hamburgueria",
+  "main": "app.js",
+  "scripts": {
+    "dev": "npx tailwindcss -i ./Styles/style.css -o ./Styles/output.css --watch"
+  },
+  "author": "Kaio V",
+  "license": "ISC",
+  "devDependencies": {
+    "tailwindcss": "^3.4.10"
+  }
+}
