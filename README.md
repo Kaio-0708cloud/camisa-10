@@ -3,6 +3,3 @@
 Este projeto está atualmente em construção. Estamos trabalhando ativamente no desenvolvimento e novas funcionalidades serão adicionadas em breve.
 Projeto aceita contribuições! 
 
-Ativar a forma de pagamento!
-
-produzindo
