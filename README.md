@@ -4,4 +4,4 @@ Este projeto está atualmente em construção. Estamos trabalhando ativamente no
 Projeto aceita contribuições! 
 
 Em produção da forma de pagamento!
-teste
+teste com a api do pagseguro.
