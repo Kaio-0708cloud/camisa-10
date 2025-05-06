@@ -13,6 +13,7 @@
     <meta property="og:image" content=""/>
     <meta property="og:description" content="O melhor hamburguer!" />
     <meta property="og:site_name" content="Vi Burguer" /> 
+    <script src="https://js.stripe.com/v3/"></script>
    
     <link rel="stylesheet" href="./Styles/output.css"/>
 
@@ -33,7 +34,7 @@
             </span>
             <div class="bg-green-600 px-4 py-1 rounded-lg mt-4" id="date-span">
                 <span class="text-white font-medium">
-                    Seg á dom - 07:00 ás 22:00
+                    24 horas para os 7 dias da semana!
                 </span>
             </div>
         </div>
@@ -193,6 +194,18 @@
             <p class="text-red-500 hidden" id="address-warn">
                 Digite seu endereço completo!
             </p>
+            
+            <p class="font-bold mt-4">E-mail:</p>
+        <input
+            type="email"
+            placeholder="Digite seu e-mail..."
+            id="email"
+            class="w-full border-2 p-1 rounded my-1"
+        />
+        <p class="text-red-500 hidden" id="email-warn">
+            Digite um e-mail válido!
+        </p>
+        
             <div class="flex items-center justify-between mt-5 w-full">
                 <button id="close-modal-btn" class="bg-gray-200 px-4 py-1 rounded">Fechar</button>
                 <button id="checkout-btn" class="bg-green-500 text-white px-4 py-1 rounded">Finalizar pedido</button>
@@ -209,9 +222,8 @@
 
             <button class="bg-gray-900 text-white px-4 py-2 rounded payment-option" id="checkout-stripe">Pagar com Cartão</button>
         </div>
-        <div class="flex items-center justify-between mt-5 w-full">
+        <div class="flex items-center justify-center mt-5 w-full">
             <button id="cancel-payment-btn" class="bg-gray-200 px-4 py-1 rounded">Cancelar</button>
-            <button id="confirm-payment-btn" class="bg-green-500 text-white px-4 py-1 rounded">Confirmar pagamento</button>
         </div>
     </div>
 </div>

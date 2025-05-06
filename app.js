@@ -129,22 +129,6 @@ addressInput.addEventListener("input", function(event) {
 
 // Função para finalizar o pedido
 checkoutBtn.addEventListener("click", function() {
-    const isOpen = checkRestaurantOpen();
-    if (!isOpen) {
-        Toastify({
-            text: "Ops, a hamburgueria está fechada!",
-            duration: 3000,
-            close: true,
-            gravity: "top", 
-            position: "right", 
-            stopOnFocus: true, 
-            style: {
-                background: "black",
-            },
-        }).showToast();
-        return;
-    }
-
     if (cart.length === 0) return;
     if (addressInput.value === "") {
         addressWarn.classList.remove("hidden");
@@ -157,38 +141,8 @@ checkoutBtn.addEventListener("click", function() {
     paymentModal.style.display = "flex"; // Abre o modal de pagamento
 });
 
-/* Função para verificar se o restaurante está aberto
-function checkRestaurantOpen() {
-    const data = new Date();
-    const hora = data.getHours();
-    return hora >= 07 && hora < 22;
-}
-
-// Atualiza a exibição do status do restaurante
-const spanItem = document.getElementById("date-span");
-const isOpen = checkRestaurantOpen();
-
-if (isOpen) {
-    spanItem.classList.remove("bg-red-500");
-    spanItem.classList.add("bg-green-600");
-} else {
-    spanItem.classList.remove("bg-green-600");
-    spanItem.classList.add("bg-red-500");
-}
-*/
-
-// Evento para finalizar o pagamento via Stripe
 checkoutStripeBtn.addEventListener("click", async function () {
-  if (cart.length === 0 || addressInput.value === "") {
-    alert("Carrinho vazio ou endereço não preenchido!");
-    return;
-  }
-
-  const cartItems = cart.map(item => ({
-    name: item.name,
-    quantity: item.quantity,
-    price: item.price,
-  }));
+  if (cart.length === 0) return;
 
   try {
     const response = await fetch("http://localhost:3000/create-checkout-session", {
@@ -197,20 +151,25 @@ checkoutStripeBtn.addEventListener("click", async function () {
         "Content-Type": "application/json"
       },
       body: JSON.stringify({
-        items: cartItems,
-        address: addressInput.value
+        items: cart.map(item => ({
+          name: item.name,
+          quantity: item.quantity,
+          price: item.price,
+        }))
       })
     });
 
-    const data = await response.json();
+    const session = await response.json();
 
-    if (data.url) {
-      window.location.href = data.url; // Redireciona para o Stripe Checkout
+    if (session.id) {
+      const stripe = Stripe("pk_test_51RLWZrRksfdSgAyaHYx4mBEdhjgInCj3KjtcHblPeJnKxDVJhO0M4ukVgPnX5U7K1qCbHuagt8FdIJph9ISyTYhR00ia3NP9DH"); // Substitua pela sua chave pública real
+      stripe.redirectToCheckout({ sessionId: session.id });
     } else {
-      alert("Erro ao redirecionar para o Stripe.");
+      throw new Error("Falha ao obter a sessão do Stripe.");
     }
+
   } catch (error) {
-    console.error("Erro:", error);
-    alert("Erro ao processar pagamento. Tente novamente.");
+    console.error("Erro no pagamento Stripe:", error);
+    alert("Ocorreu um erro ao tentar processar o pagamento.");
   }
 });

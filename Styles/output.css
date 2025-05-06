@@ -671,6 +671,10 @@ video {
   left: 0px;
 }
 
+.left-2 {
+  left: 0.5rem;
+}
+
 .top-0 {
   top: 0px;
 }
@@ -737,6 +741,18 @@ video {
 
 .clear-none {
   clear: none;
+}
+
+.m-16 {
+  margin: 4rem;
+}
+
+.m-2 {
+  margin: 0.5rem;
+}
+
+.m-7 {
+  margin: 1.75rem;
 }
 
 .mx-auto {
@@ -877,6 +893,10 @@ video {
   display: inline-grid;
 }
 
+.\!contents {
+  display: contents !important;
+}
+
 .contents {
   display: contents;
 }
@@ -887,6 +907,10 @@ video {
 
 .hidden {
   display: none;
+}
+
+.h-1 {
+  height: 0.25rem;
 }
 
 .h-28 {
