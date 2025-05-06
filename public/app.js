@@ -169,7 +169,7 @@ checkoutStripeBtn.addEventListener("click", async function () {
     const session = await response.json();
 
     if (session.id) {
-      const stripe = Stripe("pk_test_51RLWZrRksfdSgAyaHYx4mBEdhjgInCj3KjtcHblPeJnKxDVJhO0M4ukVgPnX5U7K1qCbHuagt8FdIJph9ISyTYhR00ia3NP9DH"); // Substitua pela sua chave pública real
+      const stripe = Stripe("pk_live_51RLWZiDCgQUWVX4YKX1JwdhjHT8fJ74CXCereV5tdWRFRiwOUzYKJPVJhpouBrtZmOpAxbINCI9QqUaRIpgtCjX600zNEKPFNi"); // Substitua pela sua chave pública real
       stripe.redirectToCheckout({ sessionId: session.id });
     } else {
       throw new Error("Falha ao obter a sessão do Stripe.");
