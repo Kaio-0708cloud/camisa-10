@@ -145,7 +145,7 @@ checkoutStripeBtn.addEventListener("click", async function () {
   if (cart.length === 0) return;
 
   try {
-    const response = await fetch("http://localhost:3000/create-checkout-session", {
+    const response = await fetch("/create-checkout-session", {
       method: "POST",
       headers: {
         "Content-Type": "application/json"
