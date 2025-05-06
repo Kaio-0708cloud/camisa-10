@@ -15,11 +15,7 @@ app.use(express.json());
 
 app.use(express.static(path.join(__dirname, "..", "public")));
 
-app.get("*", (req, res) => {
-  res.sendFile(path.join(__dirname, "..", "index.html"));
-});
-
-app.post("/create-checkout-session", async (req, res) => {
+app.post("/api/create-checkout-session", async (req, res) => {
   const items = req.body.items;
 
   const lineItems = items.map(item => ({
