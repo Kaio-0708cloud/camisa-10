@@ -145,7 +145,7 @@ checkoutStripeBtn.addEventListener("click", async function () {
   if (cart.length === 0) return;
 
   try {
-    const response = await fetch("https://payments-stripe.vercel.app/create-checkout-session", {
+    const response = await fetch("/api/create-checkout-session", {
       method: "POST",
       headers: {
         "Content-Type": "application/json"
