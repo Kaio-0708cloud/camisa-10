@@ -11,6 +11,7 @@ const addressWarn = document.getElementById("address-warn");
 const checkoutStripeBtn = document.getElementById("checkout-stripe");
 const paymentModal = document.getElementById("payment-modal");
 const cancelPaymentBtn = document.getElementById("cancel-payment-btn");
+
 let cart = [];
 
 // Abre o modal do carrinho ao clicar no botão
@@ -141,10 +142,12 @@ checkoutBtn.addEventListener("click", function() {
     paymentModal.style.display = "flex"; // Abre o modal de pagamento
 });
 
-closecancelPaymentBtn.addEventListener("click", function() {
+// Fecha o modal de pagamento ao clicar em "Cancelar pagamento"
+cancelPaymentBtn.addEventListener("click", function() {
   paymentModal.style.display = "none";
 });                                         )
 
+// Processa o pagamento com Stripe
 checkoutStripeBtn.addEventListener("click", async function () {
   if (cart.length === 0) return;
 
