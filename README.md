@@ -4,4 +4,4 @@ Este projeto está atualmente em construção. Estamos trabalhando ativamente no
 Contribuições são bem-vindas.
 
 Em produção da forma de pagamento!
-teste com a api do pagseguro.
+teste com a api Stripe.
