@@ -10,7 +10,7 @@ const addressInput = document.getElementById("address");
 const addressWarn = document.getElementById("address-warn");
 const checkoutStripeBtn = document.getElementById("checkout-stripe");
 const paymentModal = document.getElementById("payment-modal");
-const cancelPaymentBtn = document.getElementById("cancel-payment-btn"); 
+const cancelPaymentBtn = document.getElementById("cancel-payment-btn");
 let cart = [];
 
 // Abre o modal do carrinho ao clicar no botão
@@ -140,6 +140,10 @@ checkoutBtn.addEventListener("click", function() {
     cartModal.style.display = "none"; // Fecha o modal do carrinho
     paymentModal.style.display = "flex"; // Abre o modal de pagamento
 });
+
+closecancelPaymentBtn.addEventListener("click", function() {
+  paymentModal.style.display = "none";
+});                                         )
 
 checkoutStripeBtn.addEventListener("click", async function () {
   if (cart.length === 0) return;
