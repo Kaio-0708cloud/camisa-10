@@ -2,9 +2,10 @@
   "name": "cardapio",
   "version": "1.0.0",
   "description": "hamburgueria",
-  "main": "app.js",
+  "main": "server.js",
   "scripts": {
     "dev": "npx tailwindcss -i ./Styles/style.css -o ./Styles/output.css --watch"
+    "start": "node server.js"
   },
   "author": "Kaio V",
   "license": "ISC",
