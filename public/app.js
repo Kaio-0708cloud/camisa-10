@@ -145,7 +145,7 @@ checkoutBtn.addEventListener("click", function() {
 // Fecha o modal de pagamento ao clicar em "Cancelar pagamento"
 cancelPaymentBtn.addEventListener("click", function() {
   paymentModal.style.display = "none";
-});                                         )
+});                                         
 
 // Processa o pagamento com Stripe
 checkoutStripeBtn.addEventListener("click", async function () {
