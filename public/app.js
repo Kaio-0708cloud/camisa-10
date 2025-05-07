@@ -207,9 +207,9 @@ checkoutAsaasBtn.addEventListener("click", async function () {
       })
     });
 
-    // Verifica se a resposta foi bem-sucedida (status 200)
+    // Verifique se a resposta foi bem-sucedida antes de tentar processá-la
     if (!response.ok) {
-      throw new Error(`Erro: ${response.statusText}`);
+      throw new Error(`Erro do servidor: ${response.status} ${response.statusText}`);
     }
 
     const checkoutData = await response.json();
