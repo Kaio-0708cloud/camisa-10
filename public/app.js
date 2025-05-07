@@ -207,10 +207,14 @@ checkoutAsaasBtn.addEventListener("click", async function () {
       })
     });
 
+    // Verifica se a resposta foi bem-sucedida (status 200)
+    if (!response.ok) {
+      throw new Error(`Erro: ${response.statusText}`);
+    }
+
     const checkoutData = await response.json();
 
     if (checkoutData.checkoutUrl) {
-      
       window.location.href = checkoutData.checkoutUrl;
     } else {
       throw new Error("Falha ao obter URL do checkout PIX.");
@@ -218,6 +222,8 @@ checkoutAsaasBtn.addEventListener("click", async function () {
 
   } catch (error) {
     console.error("Erro no checkout PIX:", error);
-    alert("Ocorreu um erro ao tentar processar o pagamento PIX.");
+
+    // Exibe uma mensagem mais clara ao usuário
+    alert(`Ocorreu um erro ao tentar processar o pagamento PIX. Detalhes: ${error.message}`);
   }
 });
