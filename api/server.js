@@ -62,24 +62,24 @@ app.post("/api/create-asaas-pix-checkout", async (req, res) => {
     const total = items.reduce((sum, item) => sum + (item.price * item.quantity), 0);
     
     const customer = {
-      name: "Nome do Cliente", // Nome do cliente
+      name: "Nome do Cliente", 
       email: email,
-      cpfCnpj: "12345678901" // Informar CPF ou CNPJ válido
+      cpfCnpj: "12345678901" 
     };
 
     const dueDate = new Date();
     dueDate.setDate(dueDate.getDate() + 1);
-    const dueDateString = dueDate.toISOString().split('T')[0]; // Formato yyyy-MM-dd
+    const dueDateString = dueDate.toISOString().split('T')[0]; 
     
     const response = await asaasClient.post('/payments', {
       billingType: 'PIX',
-      customer: customer, // Passando o cliente corretamente
+      customer: customer, 
       value: total,
       dueDate: dueDateString,
       description: `Pedido de ${items.map(i => i.name).join(', ')}`,
       externalReference: `pedido-${Date.now()}`,
       notificationDisabled: false,
-      callbackUrl: 'https://payments-stripe.vercel.app/success.html', // Corrigido para callbackUrl
+      callbackUrl: 'https://payments-stripe.vercel.app/success.html',
       autoRedirect: true
     });
 
