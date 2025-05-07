@@ -11,7 +11,6 @@ const nameInput = document.getElementById("name");
 const cpfCnpjInput = document.getElementById("cpfCnpj");
 const phoneInput = document.getElementById("phone");
 const emailInput = document.getElementById("email");
-const addressWarn = document.getElementById("address-warn");
 const nameWarn = document.getElementById("name-warn");
 const cpfCnpjWarn = document.getElementById("cpfCnpj-warn");
 const phoneWarn = document.getElementById("phone-warn");
@@ -129,7 +128,7 @@ function removeItemCart(name) {
 }
 
 // Valida o campo de endereço ao digitar
-afunction addInputListener(input, warn) {
+function addInputListener(input, warn) {
     input.addEventListener("input", function (event) {
         const value = event.target.value.trim();
         if (value !== "") {
