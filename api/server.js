@@ -60,19 +60,23 @@ app.post("/api/create-asaas-pix-checkout", async (req, res) => {
   
  try {
     const total = items.reduce((sum, item) => sum + (item.price * item.quantity), 0);
-    
+
     const customerResponse = await asaasClient.post("/customers", {
       name: email.split("@")[0],
       email: email
     });
 
-   const customerId = customerResponse.data.id;
-   
-   const dueDate = new Date();
-    dueDate.setDate(dueDate.getDate() + 1);
-    const dueDateString = dueDate.toISOString().split('T')[0];
+    if (!customerResponse.data?.id) {
+      throw new Error("ID do cliente não retornado pela API do Asaas.");
+    }
 
-    const response = await asaasClient.post("/payments", {
+    const customerId = customerResponse.data.id;
+
+    const dueDate = new Date();
+    dueDate.setDate(dueDate.getDate() + 1);
+    const dueDateString = dueDate.toISOString().split("T")[0];
+
+    const paymentResponse = await asaasClient.post("/payments", {
       billingType: "PIX",
       customer: customerId,
       value: total,
@@ -83,19 +87,19 @@ app.post("/api/create-asaas-pix-checkout", async (req, res) => {
       autoRedirect: false
     });
 
-    const { id, pixQrCode, pixQrCodeImage, invoiceUrl } = response.data;
+    if (!paymentResponse.data?.id) {
+      throw new Error("Erro ao criar pagamento PIX: resposta inválida da API.");
+    }
 
     res.json({
-      paymentId: id,
-      checkoutUrl: `https://checkout.asaas.com/c/${response.data.id}`,
-      qrCode: pixQrCode,
-      qrCodeImage: pixQrCodeImage
+      paymentId: paymentResponse.data.id,
+      checkoutUrl: `https://checkout.asaas.com/c/${paymentResponse.data.id}`,
+      qrCode: paymentResponse.data.pixQrCode,
+      qrCodeImage: paymentResponse.data.pixQrCodeImage
     });
-  
   } catch (error) {
     console.error("Erro ao criar pagamento PIX:", error.response?.data || error.message);
     res.status(500).json({ error: "Erro ao criar pagamento PIX." });
   }
 });
-
 module.exports = app;
