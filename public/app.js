@@ -7,15 +7,7 @@ const checkoutBtn = document.getElementById("checkout-btn");
 const closeModalBtn = document.getElementById("close-modal-btn");
 const cartCounter = document.getElementById("cart-count");
 const addressInput = document.getElementById("address");
-const nameInput = document.getElementById("name");
-const cpfCnpjInput = document.getElementById("cpfCnpj");
-const phoneInput = document.getElementById("phone");
-const emailInput = document.getElementById("email");
-const nameWarn = document.getElementById("name-warn");
-const cpfCnpjWarn = document.getElementById("cpfCnpj-warn");
-const phoneWarn = document.getElementById("phone-warn");
 const addressWarn = document.getElementById("address-warn");
-const emailWarn = document.getElementById("email-warn");
 const checkoutStripeBtn = document.getElementById("checkout-stripe");
 const checkoutAsaasBtn = document.getElementById("checkout-asaas")
 const paymentModal = document.getElementById("payment-modal");
@@ -128,66 +120,32 @@ function removeItemCart(name) {
 }
 
 // Valida o campo de endereço ao digitar
-function addInputListener(input, warn) {
-    input.addEventListener("input", function (event) {
-        const value = event.target.value.trim();
-        if (value !== "") {
-            input.classList.remove("border-red-500");
-            warn.classList.add("hidden");
-        }
-    });
-}
+addressInput.addEventListener("input", function(event) {
+    let inputValue = event.target.value;
 
-// Aplicando escuta em todos os campos
-addInputListener(nameInput, nameWarn);
-addInputListener(cpfCnpjInput, cpfCnpjWarn);
-addInputListener(phoneInput, phoneWarn);
-addInputListener(addressInput, addressWarn);
-addInputListener(emailInput, emailWarn);
+    if (inputValue !== "") {
+        addressInput.classList.remove("border-red-500");
+        addressWarn.classList.add("hidden");
+    }
+});
 
 // Função para finalizar o pedido
-checkoutBtn.addEventListener("click", function () {
-    let valid = true;
-
-    // Verificações de preenchimento
-    if (nameInput.value.trim() === "") {
-        nameWarn.classList.remove("hidden");
-        nameInput.classList.add("border-red-500");
-        valid = false;
-    }
-
-    if (cpfCnpjInput.value.trim() === "") {
-        cpfCnpjWarn.classList.remove("hidden");
-        cpfCnpjInput.classList.add("border-red-500");
-        valid = false;
-    }
-
-    if (phoneInput.value.trim() === "") {
-        phoneWarn.classList.remove("hidden");
-        phoneInput.classList.add("border-red-500");
-        valid = false;
-    }
-
-    if (addressInput.value.trim() === "") {
+checkoutBtn.addEventListener("click", function() {
+    if (cart.length === 0) return;
+    if (addressInput.value === "") {
         addressWarn.classList.remove("hidden");
         addressInput.classList.add("border-red-500");
-        valid = false;
+        return;
     }
-
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!emailRegex.test(emailInput.value.trim())) {
-        emailWarn.classList.remove("hidden");
-        emailInput.classList.add("border-red-500");
-        valid = false;
-    }
-
-    if (!valid || cart.length === 0) return;
-
-});
 
     // Atualiza o modal do carrinho e abre o modal de pagamento
     cartModal.style.display = "none"; // Fecha o modal do carrinho
     paymentModal.style.display = "flex"; // Abre o modal de pagamento
+});
+
+// Fecha o modal de pagamento ao clicar em "Cancelar pagamento"
+cancelPaymentBtn.addEventListener("click", function() {
+  paymentModal.style.display = "none";
 });
 
 // Fecha o modal de pagamento ao clicar em "Cancelar pagamento"
