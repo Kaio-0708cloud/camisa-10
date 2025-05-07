@@ -12,7 +12,7 @@
   ],
   "routes": [
     {
-      "src": "/api/create-checkout-session",
+      "src": "/api/(.*)",
       "dest": "api/server.js"
     },
     {

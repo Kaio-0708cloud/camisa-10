@@ -9,6 +9,7 @@ const cartCounter = document.getElementById("cart-count");
 const addressInput = document.getElementById("address");
 const addressWarn = document.getElementById("address-warn");
 const checkoutStripeBtn = document.getElementById("checkout-stripe");
+const checkoutAsaasBtn = document.getElementById("checkout-asaas")
 const paymentModal = document.getElementById("payment-modal");
 const cancelPaymentBtn = document.getElementById("cancel-payment-btn");
 
@@ -178,5 +179,45 @@ checkoutStripeBtn.addEventListener("click", async function () {
   } catch (error) {
     console.error("Erro no pagamento Stripe:", error);
     alert("Ocorreu um erro ao tentar processar o pagamento.");
+  }
+});
+
+checkoutAsaasBtn.addEventListener("click", async function () {
+  if (cart.length === 0) return;
+
+  const email = document.getElementById("email").value;
+  if (!email || !email.includes("@")) {
+    document.getElementById("email-warn").classList.remove("hidden");
+    return;
+  }
+
+  try {
+    const response = await fetch("/api/create-asaas-pix-checkout", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({
+        items: cart.map(item => ({
+          name: item.name,
+          quantity: item.quantity,
+          price: item.price,
+        })),
+        email: email
+      })
+    });
+
+    const checkoutData = await response.json();
+
+    if (checkoutData.checkoutUrl) {
+      // Redireciona para o checkout PIX do Asaas
+      window.location.href = checkoutData.checkoutUrl;
+    } else {
+      throw new Error("Falha ao obter URL do checkout PIX.");
+    }
+
+  } catch (error) {
+    console.error("Erro no checkout PIX:", error);
+    alert("Ocorreu um erro ao tentar processar o pagamento PIX.");
   }
 });
