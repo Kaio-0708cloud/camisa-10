@@ -67,29 +67,31 @@ app.post("/api/create-asaas-pix-checkout", async (req, res) => {
       cpfCnpj: "12345678901" 
     };
 
-    const dueDate = new Date();
+   const dueDate = new Date();
     dueDate.setDate(dueDate.getDate() + 1);
-    const dueDateString = dueDate.toISOString().split('T')[0]; 
-    
-    const response = await asaasClient.post('/payments', {
-      billingType: 'PIX',
-      customer: customer, 
+    const dueDateString = dueDate.toISOString().split('T')[0];
+
+    const response = await asaasClient.post("/payments", {
+      billingType: "PIX",
+      customer: customerId,
       value: total,
       dueDate: dueDateString,
-      description: `Pedido de ${items.map(i => i.name).join(', ')}`,
+      description: `Pedido de ${items.map((i) => i.name).join(", ")}`,
       externalReference: `pedido-${Date.now()}`,
       notificationDisabled: false,
-      callbackUrl: 'https://payments-stripe.vercel.app/success.html',
-      autoRedirect: true
+      autoRedirect: false
     });
 
+    const { id, pixQrCode, pixQrCodeImage } = response.data;
+
     res.json({
-      checkoutUrl: `https://checkout.asaas.com/c/${response.data.id}`,
-      paymentId: response.data.id
+      paymentId: id,
+      qrCode: pixQrCode,
+      qrCodeImage: pixQrCodeImage
     });
   } catch (error) {
-    console.error("Erro ao criar checkout PIX:", error.response?.data || error.message);
-    res.status(500).json({ error: "Erro ao criar checkout PIX" });
+    console.error("Erro ao criar pagamento PIX:", error.response?.data || error.message);
+    res.status(500).json({ error: "Erro ao criar pagamento PIX." });
   }
 });
 
