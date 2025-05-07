@@ -54,7 +54,7 @@ app.post("/api/create-checkout-session", async (req, res) => {
     res.status(500).json({ error: "Erro ao criar sessão" });
   }
 });
-/*
+
 app.post("/api/create-asaas-pix-checkout", async (req, res) => {
   const { items, email } = req.body;
 
@@ -98,72 +98,11 @@ app.post("/api/create-asaas-pix-checkout", async (req, res) => {
       qrCodeImage: paymentResponse.data.pixQrCodeImage
     });
 
-  } catch (error) {
+} catch (error) {
     console.error("Erro ao criar pagamento PIX:", error.response?.data || error.message);
-    res.status(500).json({ error: "Erro ao criar pagamento PIX." });
-  }
-});
-*/
-app.post("/api/create-asaas-pix-checkout", async (req, res) => {
-  const { items, email } = req.body;
-
-  try {
-    const total = items.reduce((sum, item) => sum + (item.price * item.quantity), 0);
-
-    // Criação do cliente
-    const customerResponse = await asaasClient.post("/customers", {
-      name: email.split("@")[0],
-      email: email
+    res.status(500).json({ 
+        error: "Erro ao criar pagamento PIX.",
+        details: error.response?.data 
     });
-
-    if (!customerResponse.data?.id) {
-      throw new Error("ID do cliente não retornado pela API do Asaas.");
-    }
-
-    const customerId = customerResponse.data.id;
-
-    // Criação da chave PIX do tipo EVP
-    const pixKeyResponse = await asaasClient.post("/pix/addressKeys", {
-      type: "EVP"
-    });
-
-    if (!pixKeyResponse.data?.key) {
-      throw new Error("Erro ao criar chave PIX: chave não retornada.");
-    }
-
-    // Geração da data de vencimento
-    const dueDate = new Date();
-    dueDate.setDate(dueDate.getDate() + 1);
-    const dueDateString = dueDate.toISOString().split("T")[0];
-
-    // Criação do pagamento via PIX
-    const paymentResponse = await asaasClient.post("/payments", {
-      billingType: "PIX",
-      customer: customerId,
-      value: total,
-      dueDate: dueDateString,
-      description: `Pedido de ${items.map((i) => i.name).join(", ")}`,
-      externalReference: `pedido-${Date.now()}`,
-      notificationDisabled: false,
-      autoRedirect: false
-    });
-
-    if (!paymentResponse.data?.id) {
-      throw new Error("Erro ao criar pagamento PIX: resposta inválida da API.");
-    }
-
-    res.json({
-      paymentId: paymentResponse.data.id,
-      checkoutUrl: `https://www.asaas.com/pay/${paymentResponse.data.id}`,
-      qrCode: paymentResponse.data.pixQrCode,
-      qrCodeImage: paymentResponse.data.pixQrCodeImage,
-      pixKey: pixKeyResponse.data.key // chave EVP retornada (opcional exibir ao cliente)
-    });
-
-  } catch (error) {
-    console.error("Erro ao criar pagamento PIX:", error.response?.data || error.message);
-    res.status(500).json({ error: "Erro ao criar pagamento PIX." });
-  }
-});
-
+}
 module.exports = app;
