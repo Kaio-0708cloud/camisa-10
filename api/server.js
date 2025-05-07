@@ -58,26 +58,33 @@ app.post("/api/create-checkout-session", async (req, res) => {
 app.post("/api/create-asaas-pix-checkout", async (req, res) => {
   const { items, email } = req.body;
   
-  try {
-   
+ try {
     const total = items.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+    
+    const customer = {
+      name: "Nome do Cliente", // Nome do cliente
+      email: email,
+      cpfCnpj: "12345678901" // Informar CPF ou CNPJ válido
+    };
+
+    const dueDate = new Date();
+    dueDate.setDate(dueDate.getDate() + 1);
+    const dueDateString = dueDate.toISOString().split('T')[0]; // Formato yyyy-MM-dd
     
     const response = await asaasClient.post('/payments', {
       billingType: 'PIX',
-      customer: email,
+      customer: customer, // Passando o cliente corretamente
       value: total,
-      dueDate: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString().split('T')[0], // Vencimento em 24h
+      dueDate: dueDateString,
       description: `Pedido de ${items.map(i => i.name).join(', ')}`,
       externalReference: `pedido-${Date.now()}`,
-      notificationDisabled: false, // Habilita webhooks
-      callback: {
-        successUrl: 'https://payments-stripe.vercel.app/success.html',
-        autoRedirect: true
-      }
+      notificationDisabled: false,
+      callbackUrl: 'https://payments-stripe.vercel.app/success.html', // Corrigido para callbackUrl
+      autoRedirect: true
     });
 
     res.json({
-      checkoutUrl: `https://www.asaas.com/checkout/c/${response.data.id}`,
+      checkoutUrl: `https://checkout.asaas.com/c/${response.data.id}`,
       paymentId: response.data.id
     });
   } catch (error) {
