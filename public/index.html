@@ -183,70 +183,32 @@
    
     <div class="bg-black/50 w-full h-full fixed top-0 left-0 z-[99] flex items-center justify-center hidden"
     id="cart-modal">
-    <div class="bg-white p-5 rounded-md min-w-[90%] md:min-w-[600px]  max-h-[90vh] overflow-y-auto">
+    <div class="bg-white p-5 rounded-md min-w-[90%] md:min-w-[600px]">
         <h2 class="text-center font-bold text-2xl mb-2">Meu carrinho</h2>
         <div id="cart-items" class="flex justify-between mb-2 flex-col max-h[400px] overflow-auto"></div>
             <p class="font-bold">Total: <span id="cart-total">R$ 0.00</span></p>
-            <p class="font-bold mt-4">Nome completo:</p>
+            <p class="font-bold mt-4">Endereço de entrega:</p>
             <input
                 type="text"
-                placeholder="Digite seu nome completo..."
-                id="name"
+                placeholder="Digite seu endereço completo..."
+                id="address"
                 class="w-full border-2 p-1 rounded my-1"
             />
-
-          <p class="text-red-500 hidden" id="name-warn">
-                Digite seu nome completo!
-          </p>
-
-          <p class="font-bold mt-4">CPF ou CNPJ:</p>
-          <input
-                type="text"
-                placeholder="Digite seu CPF ou CNPJ..."
-                id="cpfCnpj"
-                class="w-full border-2 p-1 rounded my-1"
-          />
-
-          <p class="text-red-500 hidden" id="cpfCnpj-warn">
-                Digite seu CPF ou CNPJ válido!
-          </p>
-
-          <p class="font-bold mt-4">Telefone:</p>
-          <input
-               type="text"
-               placeholder="Digite seu telefone..."
-               id="phone"
-               class="w-full border-2 p-1 rounded my-1"
-          />
-
-          <p class="text-red-500 hidden" id="phone-warn">
-               Digite um telefone válido!
-          </p>
-
-         <p class="font-bold mt-4">Endereço de entrega:</p>
-         <input
-              type="text"
-              placeholder="Digite seu endereço completo..."
-              id="address"
-              class="w-full border-2 p-1 rounded my-1"
-         />
-
-         <p class="text-red-500 hidden" id="address-warn">
-              Digite seu endereço completo!
-         </p>
-
-         <p class="font-bold mt-4">E-mail:</p>
-         <input
-              type="email"
-              placeholder="Digite seu e-mail..."
-              id="email"
-              class="w-full border-2 p-1 rounded my-1"
-         />
-
-         <p class="text-red-500 hidden" id="email-warn">
-              Digite um e-mail válido!
-         </p>
-
+            <p class="text-red-500 hidden" id="address-warn">
+                Digite seu endereço completo!
+            </p>
+            
+            <p class="font-bold mt-4">E-mail:</p>
+        <input
+            type="email"
+            placeholder="Digite seu e-mail..."
+            id="email"
+            class="w-full border-2 p-1 rounded my-1"
+        />
+        <p class="text-red-500 hidden" id="email-warn">
+            Digite um e-mail válido!
+        </p>
+        
             <div class="flex items-center justify-between mt-5 w-full">
                 <button id="close-modal-btn" class="bg-gray-200 px-4 py-1 rounded">Fechar</button>
                 <button id="checkout-btn" class="bg-green-500 text-white px-4 py-1 rounded">Finalizar pedido</button>
@@ -261,7 +223,7 @@
         <h2 class="text-center font-bold text-2xl mb-2">Escolha a forma de pagamento</h2>
         <div class="flex flex-col gap-4">
 
-            <button class="bg-gray-900 text-white px-4 py-2 rounded payment-option" id="checkout-asaas">Pagar com Pix</button>
+            <button class="bg-gray-900 text-white px-4 py-2 rounded payment-option" id="checkout-asaas"> Pagar com Pix</button>
             <button class="bg-gray-900 text-white px-4 py-2 rounded payment-option" id="checkout-stripe">Pagar com Cartão</button>
         </div>
         <div class="flex items-center justify-center mt-5 w-full">
@@ -282,3 +244,4 @@
 <script src="app.js"></script>
 </body>
 </html>
+
