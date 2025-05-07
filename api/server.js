@@ -96,8 +96,7 @@ app.post("/api/create-asaas-pix-checkout", async (req, res) => {
     if (!customerId) {
       throw new Error("Falha ao criar cliente no Asaas");
     }
-
-
+    
     const dueDate = new Date();
     dueDate.setDate(dueDate.getDate() + 1); 
 
@@ -117,11 +116,8 @@ app.post("/api/create-asaas-pix-checkout", async (req, res) => {
 
     res.json({
       success: true,
-      paymentId: paymentResponse.data.id,
-      qrCode: paymentResponse.data.pixQrCode,
-      payload: paymentResponse.data.pixPayload,
-      expirationDate: paymentResponse.data.dueDate,
-      total: total.toFixed(2)
+      checkoutUrl: `https://www.asaas.com/pay/${paymentResponse.data.id}`,
+      paymentId: paymentResponse.data.id
     });
 
   } catch (error) {
