@@ -100,6 +100,9 @@ app.post("/api/create-asaas-pix-checkout", async (req, res) => {
 
   } catch (error) {
     console.error("Erro ao criar pagamento PIX:", error.response?.data || error.message);
+    
+    // Logando o erro para entender melhor
+    console.log("Detalhes do erro:", error);
 
     // Retorna um erro com detalhes no formato JSON
     res.status(500).json({
