@@ -22,12 +22,26 @@ const asaasClient = axios.create({
 app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
-
 app.use(express.static(path.join(__dirname, "..", "public")));
 
 app.post("/api/create-checkout-session", async (req, res) => {
   const items = req.body.items;
 
+  
+  try {
+    if (!items || !Array.isArray(items) || items.length === 0) {
+      return res.status(400).json({ error: "Carrinho vazio ou inválido" });
+    }
+    
+    if (!email || !email.includes("@")) {
+      return res.status(400).json({ error: "E-mail inválido" });
+    }
+    
+    const total = items.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+    if (total <= 0) {
+      return res.status(400).json({ error: "Valor total inválido" });
+    }
+  
   const lineItems = items.map(item => ({
     price_data: {
       currency: 'brl',
@@ -58,48 +72,68 @@ app.post("/api/create-checkout-session", async (req, res) => {
 app.post("/api/create-asaas-pix-checkout", async (req, res) => {
   const { items, email } = req.body;
   
- try {
-    const total = items.reduce((sum, item) => sum + (item.price * item.quantity), 0);
-
-    const customerResponse = await asaasClient.post("/customers", {
-      name: email.split("@")[0],
-      email: email
-    });
-
-    if (!customerResponse.data?.id) {
-      throw new Error("ID do cliente não retornado pela API do Asaas.");
+  try {
+    if (!items || !Array.isArray(items) || items.length === 0) {
+      return res.status(400).json({ error: "Carrinho vazio ou inválido" });
+    }
+    
+    if (!email || !email.includes("@")) {
+      return res.status(400).json({ error: "E-mail inválido" });
     }
 
-    const customerId = customerResponse.data.id;
+    const total = items.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+    if (total <= 0) {
+      return res.status(400).json({ error: "Valor total inválido" });
+    }
+
+    const customerResponse = await asaasClient.post("/customers", {
+      name: email.split("@")[0] || "Cliente",
+      email: email,
+      notificationDisabled: false
+    });
+
+    const customerId = customerResponse.data?.id;
+    if (!customerId) {
+      throw new Error("Falha ao criar cliente no Asaas");
+    }
+
 
     const dueDate = new Date();
-    dueDate.setDate(dueDate.getDate() + 1);
-    const dueDateString = dueDate.toISOString().split("T")[0];
+    dueDate.setDate(dueDate.getDate() + 1); 
 
     const paymentResponse = await asaasClient.post("/payments", {
       billingType: "PIX",
       customer: customerId,
-      value: total,
-      dueDate: dueDateString,
-      description: `Pedido de ${items.map((i) => i.name).join(", ")}`,
-      externalReference: `pedido-${Date.now()}`,
-      notificationDisabled: false,
-      autoRedirect: false
+      value: total.toFixed(2),
+      dueDate: dueDate.toISOString().split("T")[0],
+      description: `Pedido ${Date.now()}`,
+      externalReference: `ref-${Date.now()}`,
+      notificationDisabled: false
     });
 
     if (!paymentResponse.data?.id) {
-      throw new Error("Erro ao criar pagamento PIX: resposta inválida da API.");
+      throw new Error("Falha ao criar pagamento PIX");
     }
 
     res.json({
+      success: true,
       paymentId: paymentResponse.data.id,
-      checkoutUrl: `https://www.asaas.com/pay/${paymentResponse.data.id}`,
       qrCode: paymentResponse.data.pixQrCode,
-      qrCodeImage: paymentResponse.data.pixQrCodeImage
+      payload: paymentResponse.data.pixPayload,
+      expirationDate: paymentResponse.data.dueDate,
+      total: total.toFixed(2)
     });
+
   } catch (error) {
-    console.error("Erro ao criar pagamento PIX:", error.response?.data || error.message);
-    res.status(500).json({ error: "Erro ao criar pagamento PIX." });
+    console.error("Erro no PIX:", {
+      message: error.message,
+      response: error.response?.data,
+      stack: error.stack
+    });
+    res.status(500).json({ 
+      error: "Erro ao processar PIX",
+      details: error.response?.data || error.message
+    });
   }
 });
 module.exports = app;
