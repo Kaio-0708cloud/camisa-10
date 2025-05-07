@@ -209,15 +209,11 @@ checkoutAsaasBtn.addEventListener("click", async function () {
 
     const checkoutData = await response.json();
 
-    if (!response.ok) {
-      console.error("Erro ao criar checkout:", checkoutData);
-      throw new Error(checkoutData.error || "Erro inesperado ao criar pagamento PIX.");
-    }
-
     if (checkoutData.checkoutUrl) {
+      
       window.location.href = checkoutData.checkoutUrl;
     } else {
-      throw new Error("Checkout Pix não disponível.");
+      throw new Error("Falha ao obter URL do checkout PIX.");
     }
 
   } catch (error) {
