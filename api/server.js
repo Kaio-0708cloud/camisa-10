@@ -61,11 +61,10 @@ app.post("/api/create-asaas-pix-checkout", async (req, res) => {
  try {
     const total = items.reduce((sum, item) => sum + (item.price * item.quantity), 0);
     
-    const customer = {
-      name: "Nome do Cliente", 
-      email: email,
-      cpfCnpj: "12345678901" 
-    };
+    const customerResponse = await asaasClient.post("/customers", {
+      name: email.split("@")[0],
+      email: email
+    });
 
    const dueDate = new Date();
     dueDate.setDate(dueDate.getDate() + 1);
