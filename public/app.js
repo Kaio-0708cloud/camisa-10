@@ -182,7 +182,7 @@ checkoutStripeBtn.addEventListener("click", async function () {
   }
 });
 // Processa o pagamento com Asaas
-checkoutAsaasBtn.addEventListener("click", async function () {
+/*checkoutAsaasBtn.addEventListener("click", async function () {
   if (cart.length === 0) return;
 
   const email = document.getElementById("email").value;
@@ -224,6 +224,59 @@ checkoutAsaasBtn.addEventListener("click", async function () {
     console.error("Erro no checkout PIX:", error);
 
     // Exibe uma mensagem mais clara ao usuário
+    alert(`Ocorreu um erro ao tentar processar o pagamento PIX. Detalhes: ${error.message}`);
+  }
+}); */
+
+// Evento de clique no botão de checkout PIX
+checkoutAsaasBtn.addEventListener("click", async function () {
+  // Verifica se o carrinho está vazio
+  if (cart.length === 0) return;
+
+  const email = document.getElementById("email").value;
+
+  // Valida o e-mail fornecido
+  if (!email || !email.includes("@")) {
+    document.getElementById("email-warn").classList.remove("hidden");
+    return;
+  }
+
+  try {
+    // Envia os dados para o back-end para criar o checkout PIX
+    const response = await fetch("/api/create-asaas-pix-checkout", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({
+        items: cart.map(item => ({
+          name: item.name,
+          quantity: item.quantity,
+          price: item.price,
+        })),
+        email: email
+      })
+    });
+
+    // Verifica se a resposta foi bem-sucedida
+    if (!response.ok) {
+      throw new Error(`Erro do servidor: ${response.status} ${response.statusText}`);
+    }
+
+    const checkoutData = await response.json();
+
+    // Verifica se a URL do checkout foi retornada
+    if (checkoutData.checkoutUrl) {
+      // Redireciona o usuário para o checkout PIX
+      window.location.href = checkoutData.checkoutUrl;
+    } else {
+      throw new Error("Falha ao obter URL do checkout PIX.");
+    }
+
+  } catch (error) {
+    console.error("Erro no checkout PIX:", error);
+
+    // Exibe uma mensagem mais clara ao usuário em caso de erro
     alert(`Ocorreu um erro ao tentar processar o pagamento PIX. Detalhes: ${error.message}`);
   }
 });
