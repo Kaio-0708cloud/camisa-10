@@ -93,7 +93,7 @@ app.post("/api/create-asaas-pix-checkout", async (req, res) => {
 
     res.json({
       paymentId: paymentResponse.data.id,
-      checkoutUrl: `https://checkout.asaas.com/c/${paymentResponse.data.id}`,
+      checkoutUrl: `https://www.asaas.com/pay/${paymentResponse.data.id}`,
       qrCode: paymentResponse.data.pixQrCode,
       qrCodeImage: paymentResponse.data.pixQrCodeImage
     });
