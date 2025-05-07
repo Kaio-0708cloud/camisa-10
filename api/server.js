@@ -66,6 +66,8 @@ app.post("/api/create-asaas-pix-checkout", async (req, res) => {
       email: email
     });
 
+   const customerId = customerResponse.data.id;
+   
    const dueDate = new Date();
     dueDate.setDate(dueDate.getDate() + 1);
     const dueDateString = dueDate.toISOString().split('T')[0];
@@ -81,13 +83,15 @@ app.post("/api/create-asaas-pix-checkout", async (req, res) => {
       autoRedirect: false
     });
 
-    const { id, pixQrCode, pixQrCodeImage } = response.data;
+    const { id, pixQrCode, pixQrCodeImage, invoiceUrl } = response.data;
 
     res.json({
       paymentId: id,
+      checkoutUrl: invoiceUrl,
       qrCode: pixQrCode,
       qrCodeImage: pixQrCodeImage
     });
+  
   } catch (error) {
     console.error("Erro ao criar pagamento PIX:", error.response?.data || error.message);
     res.status(500).json({ error: "Erro ao criar pagamento PIX." });
