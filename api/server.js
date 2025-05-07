@@ -77,7 +77,7 @@ app.post("/api/create-asaas-pix-checkout", async (req, res) => {
     });
 
     res.json({
-      checkoutUrl: `https://www.asaas.com/c/${response.data.id}`,
+      checkoutUrl: `https://checkout.asaas.com/c/${response.data.id}`,
       paymentId: response.data.id
     });
   } catch (error) {
