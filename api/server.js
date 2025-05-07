@@ -22,24 +22,12 @@ const asaasClient = axios.create({
 app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+
 app.use(express.static(path.join(__dirname, "..", "public")));
 
 app.post("/api/create-checkout-session", async (req, res) => {
-  const items = req.body.items;  
-  try {
-    if (!items || !Array.isArray(items) || items.length === 0) {
-      return res.status(400).json({ error: "Carrinho vazio ou inválido" });
-    }
-    
-    if (!email || !email.includes("@")) {
-      return res.status(400).json({ error: "E-mail inválido" });
-    }
-    
-    const total = items.reduce((sum, item) => sum + (item.price * item.quantity), 0);
-    if (total <= 0) {
-      return res.status(400).json({ error: "Valor total inválido" });
-    }
-  
+  const items = req.body.items;
+
   const lineItems = items.map(item => ({
     price_data: {
       currency: 'brl',
@@ -69,50 +57,32 @@ app.post("/api/create-checkout-session", async (req, res) => {
 
 app.post("/api/create-asaas-pix-checkout", async (req, res) => {
   const { items, email } = req.body;
-
+  
   try {
+   
     const total = items.reduce((sum, item) => sum + (item.price * item.quantity), 0);
-
-    const customerResponse = await asaasClient.post("/customers", {
-      name: email.split("@")[0],
-      email: email
-    });
-
-    if (!customerResponse.data?.id) {
-      throw new Error("ID do cliente não retornado pela API do Asaas.");
-    }
-
-    const customerId = customerResponse.data.id;
-
-    const dueDate = new Date();
-    dueDate.setDate(dueDate.getDate() + 1);
-    const dueDateString = dueDate.toISOString().split("T")[0];
-
-    const paymentResponse = await asaasClient.post("/payments", {
-      billingType: "PIX",
-      customer: customerId,
+    
+    const response = await asaasClient.post('/payments', {
+      billingType: 'PIX',
+      customer: email,
       value: total,
-      dueDate: dueDateString,
-      description: `Pedido de ${items.map((i) => i.name).join(", ")}`,
+      dueDate: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString().split('T')[0], // Vencimento em 24h
+      description: `Pedido de ${items.map(i => i.name).join(', ')}`,
       externalReference: `pedido-${Date.now()}`,
-      notificationDisabled: false,
-      autoRedirect: false
+      notificationDisabled: false, // Habilita webhooks
+      callback: {
+        successUrl: 'https://payments-stripe.vercel.app/success.html',
+        autoRedirect: true
+      }
     });
-
-    if (!paymentResponse.data?.id) {
-      throw new Error("Erro ao criar pagamento PIX: resposta inválida da API.");
-    }
 
     res.json({
-      paymentId: paymentResponse.data.id,
-      checkoutUrl: `https://checkout.asaas.com/c/${paymentResponse.data.id}`,
-      qrCode: paymentResponse.data.pixQrCode,
-      qrCodeImage: paymentResponse.data.pixQrCodeImage
+      checkoutUrl: `https://checkout.asaas.com/c/${response.data.id}`,
+      paymentId: response.data.id
     });
-
   } catch (error) {
-    console.error("Erro ao criar pagamento PIX:", error.response?.data || error.message);
-    res.status(500).json({ error: "Erro ao criar pagamento PIX." });
+    console.error("Erro ao criar checkout PIX:", error.response?.data || error.message);
+    res.status(500).json({ error: "Erro ao criar checkout PIX" });
   }
 });
 
