@@ -181,7 +181,7 @@ checkoutStripeBtn.addEventListener("click", async function () {
     alert("Ocorreu um erro ao tentar processar o pagamento.");
   }
 });
-
+// Processa o pagamento com Asaas
 checkoutAsaasBtn.addEventListener("click", async function () {
   if (cart.length === 0) return;
 
