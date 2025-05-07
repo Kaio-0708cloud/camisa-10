@@ -98,11 +98,15 @@ app.post("/api/create-asaas-pix-checkout", async (req, res) => {
       qrCodeImage: paymentResponse.data.pixQrCodeImage
     });
 
-} catch (error) {
+  } catch (error) {
     console.error("Erro ao criar pagamento PIX:", error.response?.data || error.message);
-    res.status(500).json({ 
-        error: "Erro ao criar pagamento PIX.",
-        details: error.response?.data 
+
+    // Retorna um erro com detalhes no formato JSON
+    res.status(500).json({
+      error: "Erro ao criar pagamento PIX.",
+      details: error.response?.data || error.message
     });
-}
+  }
+});
+
 module.exports = app;
