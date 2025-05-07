@@ -207,19 +207,21 @@ checkoutAsaasBtn.addEventListener("click", async function () {
       })
     });
 
-    const data = await response.json();
+    const checkoutData = await response.json();
 
     if (!response.ok) {
-      throw new Error(data.error || "Erro ao gerar checkout PIX");
+      console.error("Erro ao criar checkout:", checkoutData);
+      throw new Error(checkoutData.error || "Erro inesperado ao criar pagamento PIX.");
     }
 
-    window.location.href = data.checkoutUrl;
+    if (checkoutData.checkoutUrl) {
+      window.location.href = checkoutData.checkoutUrl;
+    } else {
+      throw new Error("Checkout Pix não disponível.");
+    }
 
   } catch (error) {
     console.error("Erro no checkout PIX:", error);
-    alert(error.message || "Erro ao processar PIX");
-  } finally {
-    checkoutAsaasBtn.disabled = false;
-    checkoutAsaasBtn.textContent = "Pagar com PIX";
+    alert("Ocorreu um erro ao tentar processar o pagamento PIX.");
   }
 });
