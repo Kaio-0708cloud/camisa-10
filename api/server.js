@@ -25,9 +25,7 @@ app.use(express.urlencoded({ extended: true }));
 app.use(express.static(path.join(__dirname, "..", "public")));
 
 app.post("/api/create-checkout-session", async (req, res) => {
-  const items = req.body.items;
-
-  
+  const items = req.body.items;  
   try {
     if (!items || !Array.isArray(items) || items.length === 0) {
       return res.status(400).json({ error: "Carrinho vazio ou inválido" });
@@ -108,10 +106,18 @@ app.post("/api/create-asaas-pix-checkout", async (req, res) => {
       description: `Pedido ${Date.now()}`,
       externalReference: `ref-${Date.now()}`,
       notificationDisabled: false
+      callback: {
+        successUrl: 'https://payments-stripe.vercel.app/success.html', 
+        autoRedirect: true
+      }
     });
 
     if (!paymentResponse.data?.id) {
       throw new Error("Falha ao criar pagamento PIX");
+      callback: {
+        cancel_url: 'https://payments-stripe.vercel.app/cancel.html', 
+        autoRedirect: true
+      }
     }
 
     res.json({
