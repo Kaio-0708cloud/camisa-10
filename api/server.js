@@ -117,70 +117,50 @@ app.post("/api/create-asaas-pix-checkout", async (req, res) => {
   const { items, customer } = req.body;
 
   // Validações básicas
-  if (!items || !Array.isArray(items) || items.length === 0) {
-    return res.status(400).json({ error: "Itens do carrinho inválidos" });
-  }
-  if (!customer || !customer.name || !customer.cpfCnpj || !customer.email) {
-    return res.status(400).json({ error: "Dados do cliente incompletos" });
-  }
+  if (!items?.length) return res.status(400).json({ error: "Carrinho vazio" });
+  if (!customer?.cpfCnpj) return res.status(400).json({ error: "CPF obrigatório" });
 
   try {
+    // 1. Calcula total
     const total = items.reduce((sum, item) => sum + (item.price * item.quantity), 0);
-
-    // Cria/atualiza cliente no Asaas
+    
+    // 2. Cria cliente (permite repetição)
     const customerResponse = await asaasClient.post("/customers", {
-      name: customer.name,
-      cpfCnpj: customer.cpfCnpj,
-      email: customer.email,
-      address: customer.address,
-      mobilePhone: customer.phone || "", // Adicionar telefone se disponível
-      notificationsDisabled: false
+      name: customer.name || "Cliente",
+      cpfCnpj: customer.cpfCnpj.replace(/\D/g, ''),
+      email: customer.email || "sem@email.com",
+      mobilePhone: customer.phone?.replace(/\D/g, '') || "00000000000",
+      address: customer.address || "Não informado"
     });
 
-    if (!customerResponse.data?.id) {
-      throw new Error("Falha ao criar cliente na Asaas");
-    }
-
-    const customerId = customerResponse.data.id;
-
-    // Configura data de vencimento (1 dia)
+    // 3. Cria cobrança PIX
     const dueDate = new Date();
-    dueDate.setDate(dueDate.getDate() + 1);
-    const dueDateString = dueDate.toISOString().split("T")[0];
+    dueDate.setDate(dueDate.getDate() + 1); // Vencimento amanhã
 
-    // Cria pagamento PIX
     const paymentResponse = await asaasClient.post("/payments", {
       billingType: "PIX",
-      customer: customerId,
+      customer: customerResponse.data.id,
       value: total.toFixed(2),
-      dueDate: dueDateString,
-      description: `Pedido de ${items.map(i => i.name).join(", ")}`,
-      externalReference: `pedido-${Date.now()}`,
-      notificationDisabled: false,
-      callback: {
-        successUrl: `${process.env.BASE_URL}/success`, // Configurar sua URL
-        autoRedirect: true
-      }
+      dueDate: dueDate.toISOString().split("T")[0],
+      description: `Pedido ${new Date().toLocaleDateString()}`,
+      externalReference: `ref-${Date.now()}`,
+      notificationDisabled: false
     });
 
-    if (!paymentResponse.data?.id) {
-      throw new Error("Falha ao criar pagamento PIX");
-    }
-
-    // Retorna dados para o frontend
+    // Retorna dados do PIX
     res.json({
+      success: true,
       paymentId: paymentResponse.data.id,
       checkoutUrl: paymentResponse.data.invoiceUrl,
       qrCode: paymentResponse.data.pixQrCode,
       qrCodeImage: paymentResponse.data.pixQrCodeImage,
-      payload: paymentResponse.data.pixPayload,
       expirationDate: paymentResponse.data.expirationDate
     });
 
   } catch (error) {
-    console.error("Erro:", error.response?.data || error.message);
+    console.error("Erro Asaas:", error.response?.data || error.message);
     res.status(500).json({
-      error: "Erro ao processar pagamento",
+      error: "Erro ao criar pagamento",
       details: error.response?.data || error.message
     });
   }
