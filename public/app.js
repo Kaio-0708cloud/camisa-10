@@ -290,77 +290,55 @@ checkoutStripeBtn.addEventListener("click", async function () {
 checkoutAsaasBtn.addEventListener("click", async function () {
   if (cart.length === 0) return;
 
-  // Obter todos os campos do formulário
-  const name = document.getElementById("name").value;
-  const cpf = document.getElementById("cpf").value;
-  const address = document.getElementById("address").value;
-  const email = document.getElementById("email").value;
+  // Coleta dados básicos (sem validação rigorosa)
+  const customer = {
+    name: document.getElementById("name").value.trim() || "Cliente",
+    cpfCnpj: document.getElementById("cpf").value.trim().replace(/\D/g, ''),
+    email: document.getElementById("email").value.trim() || "sem@email.com",
+    phone: document.getElementById("phone")?.value.trim().replace(/\D/g, '') || "00000000000",
+    address: document.getElementById("address").value.trim() || "Não informado"
+  };
 
-  // Validações básicas
-  if (!name) {
-    document.getElementById("name-warn").classList.remove("hidden");
-    return;
-  }
-  if (!cpf) {
-    document.getElementById("cpf-warn").classList.remove("hidden");
-    return;
-  }
-  if (!address) {
-    document.getElementById("address-warn").classList.remove("hidden");
-    return;
-  }
-  if (!email || !email.includes("@")) {
-    document.getElementById("email-warn").classList.remove("hidden");
+  // Validação mínima
+  if (!customer.cpfCnpj || customer.cpfCnpj.length < 11) {
+    alert("CPF inválido");
     return;
   }
 
   try {
+    checkoutAsaasBtn.disabled = true;
+    checkoutAsaasBtn.innerHTML = '<i class="fa fa-spinner fa-spin"></i> Processando...';
+
     const response = await fetch("/api/create-asaas-pix-checkout", {
       method: "POST",
-      headers: {
-        "Content-Type": "application/json"
-      },
+      headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
         items: cart.map(item => ({
           name: item.name,
           quantity: item.quantity,
-          price: item.price,
+          price: item.price
         })),
-        customer: {
-          name: name,
-          cpfCnpj: cpf.replace(/\D/g, ''), // Remove caracteres não numéricos
-          email: email,
-          address: address
-        }
+        customer: customer
       })
     });
 
-    if (!response.ok) {
-      const errorData = await response.json();
-      throw new Error(errorData.error || "Erro ao processar pagamento");
+    const data = await response.json();
+    
+    if (!response.ok) throw new Error(data.error || "Erro no pagamento");
+
+    // Mostra QR Code ou redireciona
+    if (data.qrCodeImage) {
+      document.getElementById("pix-qrcode").src = data.qrCodeImage;
+      document.getElementById("pix-modal").style.display = "flex";
+    } else if (data.checkoutUrl) {
+      window.location.href = data.checkoutUrl;
     }
-
-    const checkoutData = await response.json();
-
-    if (checkoutData.checkoutUrl) {
-      window.location.href = checkoutData.checkoutUrl;
-    } else if (checkoutData.qrCode) {
-      // Opção alternativa: mostrar QR code diretamente
-      showPixModal(checkoutData);
-    } else {
-      throw new Error("Nenhum método de pagamento retornado");
-    }
-
+    
   } catch (error) {
-    console.error("Erro no checkout PIX:", error);
-    alert(`Erro: ${error.message}`);
+    console.error("Erro:", error);
+    alert(`Pagamento falhou: ${error.message}`);
+  } finally {
+    checkoutAsaasBtn.disabled = false;
+    checkoutAsaasBtn.innerHTML = '<i class="fas fa-barcode"></i> Pagar com PIX';
   }
 });
-
-// Função para mostrar modal com QR Code (opcional)
-function showPixModal(data) {
-  const pixModal = document.getElementById("pix-modal");
-  document.getElementById("pix-qrcode").src = data.qrCodeImage;
-  document.getElementById("pix-code").textContent = data.qrCode;
-  pixModal.style.display = "flex";
-}
