@@ -6,8 +6,14 @@ const cartTotal = document.getElementById("cart-total");
 const checkoutBtn = document.getElementById("checkout-btn");
 const closeModalBtn = document.getElementById("close-modal-btn");
 const cartCounter = document.getElementById("cart-count");
+const nameInput = document.getElementById("name");
+const nameWarn = document.getElementById("name-warn");
+const cpfInput = document.getElementById("cpf");
+const cpfWarn = document.getElementById("cpf-warn");
 const addressInput = document.getElementById("address");
 const addressWarn = document.getElementById("address-warn");
+const emailInput = document.getElementById("email");
+const emailWarn = document.getElementById("email-warn");
 const checkoutStripeBtn = document.getElementById("checkout-stripe");
 const checkoutAsaasBtn = document.getElementById("checkout-asaas")
 const paymentModal = document.getElementById("payment-modal");
@@ -119,23 +125,70 @@ function removeItemCart(name) {
     }
 }
 
-// Valida o campo de endereço ao digitar
-addressInput.addEventListener("input", function(event) {
-    let inputValue = event.target.value;
+nameInput.addEventListener("input", function(event) {
+    if (event.target.value !== "") {
+        nameInput.classList.remove("border-red-500");
+        nameWarn.classList.add("hidden");
+    }
+});
 
-    if (inputValue !== "") {
+// Validação em tempo real para o campo de CPF
+cpfInput.addEventListener("input", function(event) {
+    if (event.target.value !== "") {
+        cpfInput.classList.remove("border-red-500");
+        cpfWarn.classList.add("hidden");
+    }
+});
+
+// Validação em tempo real para o campo de endereço
+addressInput.addEventListener("input", function(event) {
+    if (event.target.value !== "") {
         addressInput.classList.remove("border-red-500");
         addressWarn.classList.add("hidden");
     }
 });
 
+// Validação em tempo real para o campo de email
+emailInput.addEventListener("input", function(event) {
+    if (event.target.value !== "") {
+        emailInput.classList.remove("border-red-500");
+        emailWarn.classList.add("hidden");
+    }
+});
+
 // Função para finalizar o pedido
 checkoutBtn.addEventListener("click", function() {
+    // Verifica se o carrinho está vazio
     if (cart.length === 0) return;
+    
+    let hasError = false;
+    
+    // Validação do nome
+    if (nameInput.value === "") {
+        nameWarn.classList.remove("hidden");
+        nameInput.classList.add("border-red-500");
+        hasError = true;
+    }
+    
+    // Validação do CPF
+    if (cpfInput.value === "") {
+        cpfWarn.classList.remove("hidden");
+        cpfInput.classList.add("border-red-500");
+        hasError = true;
+    }
+    
+    // Validação do endereço
     if (addressInput.value === "") {
         addressWarn.classList.remove("hidden");
         addressInput.classList.add("border-red-500");
-        return;
+        hasError = true;
+    }
+    
+    // Validação do email
+    if (emailInput.value === "") {
+        emailWarn.classList.remove("hidden");
+        emailInput.classList.add("border-red-500");
+        hasError = true;
     }
 
     // Atualiza o modal do carrinho e abre o modal de pagamento
