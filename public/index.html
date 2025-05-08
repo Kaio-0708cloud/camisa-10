@@ -181,12 +181,33 @@
         </div>
     </div>
    
-    <div class="bg-black/50 w-full h-full fixed top-0 left-0 z-[99] flex items-center justify-center hidden"
+    <div class="bg-black/50 w-full h-full fixed top-0 left-0 z-[99] flex items-start justify-center hidden overflow-y-auto py-10"
     id="cart-modal">
-    <div class="bg-white p-5 rounded-md min-w-[90%] md:min-w-[600px]">
+    <div class="bg-white p-5 rounded-md min-w-[90%] md:min-w-[600px] max-h-[calc(100vh-4rem)] overflow-y-auto">
         <h2 class="text-center font-bold text-2xl mb-2">Meu carrinho</h2>
-        <div id="cart-items" class="flex justify-between mb-2 flex-col max-h[400px] overflow-auto"></div>
+        <div id="cart-items" class="flex justify-between mb-2 flex-col overflow-y-auto"></div>
             <p class="font-bold">Total: <span id="cart-total">R$ 0.00</span></p>
+            <p class="font-bold mt-4">Nome</p>
+            <input
+                type="text"
+                placeholder="Digite seu nome completo..."
+                id="name"
+                class="w-full border-2 p-1 rounded my-1"
+            />
+            <p class="text-red-500 hidden" id="name-warn">
+                Digite seu nome completo!
+            </p>
+            
+            <p class="font-bold mt-4">CPF</p>
+        <input
+            type="cpf"
+            placeholder="Digite seu cpf..."
+            id="cpf"
+            class="w-full border-2 p-1 rounded my-1"
+        />
+        <p class="text-red-500 hidden" id="cpf-warn">
+            Digite um cpf válido!
+        </p>
             <p class="font-bold mt-4">Endereço de entrega:</p>
             <input
                 type="text"
@@ -208,7 +229,6 @@
         <p class="text-red-500 hidden" id="email-warn">
             Digite um e-mail válido!
         </p>
-        
             <div class="flex items-center justify-between mt-5 w-full">
                 <button id="close-modal-btn" class="bg-gray-200 px-4 py-1 rounded">Fechar</button>
                 <button id="checkout-btn" class="bg-green-500 text-white px-4 py-1 rounded">Finalizar pedido</button>
