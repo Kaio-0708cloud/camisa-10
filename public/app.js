@@ -288,19 +288,33 @@ checkoutStripeBtn.addEventListener("click", async function () {
 
 // Evento de clique no botão de checkout PIX
 checkoutAsaasBtn.addEventListener("click", async function () {
-  // Verifica se o carrinho está vazio
   if (cart.length === 0) return;
 
+  // Obter todos os campos do formulário
+  const name = document.getElementById("name").value;
+  const cpf = document.getElementById("cpf").value;
+  const address = document.getElementById("address").value;
   const email = document.getElementById("email").value;
 
-  // Valida o e-mail fornecido
+  // Validações básicas
+  if (!name) {
+    document.getElementById("name-warn").classList.remove("hidden");
+    return;
+  }
+  if (!cpf) {
+    document.getElementById("cpf-warn").classList.remove("hidden");
+    return;
+  }
+  if (!address) {
+    document.getElementById("address-warn").classList.remove("hidden");
+    return;
+  }
   if (!email || !email.includes("@")) {
     document.getElementById("email-warn").classList.remove("hidden");
     return;
   }
 
   try {
-    // Envia os dados para o back-end para criar o checkout PIX
     const response = await fetch("/api/create-asaas-pix-checkout", {
       method: "POST",
       headers: {
@@ -312,29 +326,41 @@ checkoutAsaasBtn.addEventListener("click", async function () {
           quantity: item.quantity,
           price: item.price,
         })),
-        email: email
+        customer: {
+          name: name,
+          cpfCnpj: cpf.replace(/\D/g, ''), // Remove caracteres não numéricos
+          email: email,
+          address: address
+        }
       })
     });
 
-    // Verifica se a resposta foi bem-sucedida
     if (!response.ok) {
-      throw new Error(`Erro do servidor: ${response.status} ${response.statusText}`);
+      const errorData = await response.json();
+      throw new Error(errorData.error || "Erro ao processar pagamento");
     }
 
     const checkoutData = await response.json();
 
-    // Verifica se a URL do checkout foi retornada
     if (checkoutData.checkoutUrl) {
-      // Redireciona o usuário para o checkout PIX
       window.location.href = checkoutData.checkoutUrl;
+    } else if (checkoutData.qrCode) {
+      // Opção alternativa: mostrar QR code diretamente
+      showPixModal(checkoutData);
     } else {
-      throw new Error("Falha ao obter URL do checkout PIX.");
+      throw new Error("Nenhum método de pagamento retornado");
     }
 
   } catch (error) {
     console.error("Erro no checkout PIX:", error);
-
-    // Exibe uma mensagem mais clara ao usuário em caso de erro
-    alert(`Ocorreu um erro ao tentar processar o pagamento PIX. Detalhes: ${error.message}`);
+    alert(`Erro: ${error.message}`);
   }
 });
+
+// Função para mostrar modal com QR Code (opcional)
+function showPixModal(data) {
+  const pixModal = document.getElementById("pix-modal");
+  document.getElementById("pix-qrcode").src = data.qrCodeImage;
+  document.getElementById("pix-code").textContent = data.qrCode;
+  pixModal.style.display = "flex";
+}
