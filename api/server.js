@@ -114,65 +114,75 @@ app.post("/api/create-asaas-pix-checkout", async (req, res) => {
 */
 
 app.post("/api/create-asaas-pix-checkout", async (req, res) => {
-  const { items, email } = req.body;
+  const { items, customer } = req.body;
+
+  // Validações básicas
+  if (!items || !Array.isArray(items) || items.length === 0) {
+    return res.status(400).json({ error: "Itens do carrinho inválidos" });
+  }
+  if (!customer || !customer.name || !customer.cpfCnpj || !customer.email) {
+    return res.status(400).json({ error: "Dados do cliente incompletos" });
+  }
 
   try {
-    // Calcula o total do pedido
     const total = items.reduce((sum, item) => sum + (item.price * item.quantity), 0);
 
-    // Cria o cliente na API do Asaas
+    // Cria/atualiza cliente no Asaas
     const customerResponse = await asaasClient.post("/customers", {
-      name: email.split("@")[0],  // Utiliza a parte do e-mail antes do "@" como nome
-      email: email
+      name: customer.name,
+      cpfCnpj: customer.cpfCnpj,
+      email: customer.email,
+      address: customer.address,
+      mobilePhone: customer.phone || "", // Adicionar telefone se disponível
+      notificationsDisabled: false
     });
 
     if (!customerResponse.data?.id) {
-      throw new Error("ID do cliente não retornado pela API do Asaas.");
+      throw new Error("Falha ao criar cliente na Asaas");
     }
 
     const customerId = customerResponse.data.id;
 
-    // Define a data de vencimento do pagamento para o dia seguinte
+    // Configura data de vencimento (1 dia)
     const dueDate = new Date();
     dueDate.setDate(dueDate.getDate() + 1);
-    const dueDateString = dueDate.toISOString().split("T")[0];  // Formato YYYY-MM-DD
+    const dueDateString = dueDate.toISOString().split("T")[0];
 
-    // Cria o pagamento via PIX
+    // Cria pagamento PIX
     const paymentResponse = await asaasClient.post("/payments", {
-      billingType: "PIX",  // Tipo de cobrança PIX
-      customer: customerId,  // ID do cliente criado
-      value: total,  // Valor total do pagamento
-      dueDate: dueDateString,  // Data de vencimento
-      description: `Pedido de ${items.map((i) => i.name).join(", ")}`,  // Descrição do pedido
-      externalReference: `pedido-${Date.now()}`,  // Referência externa única para o pedido
-      notificationDisabled: false,  // Notificações ativadas
-      autoRedirect: false  // Não redireciona automaticamente
+      billingType: "PIX",
+      customer: customerId,
+      value: total.toFixed(2),
+      dueDate: dueDateString,
+      description: `Pedido de ${items.map(i => i.name).join(", ")}`,
+      externalReference: `pedido-${Date.now()}`,
+      notificationDisabled: false,
+      callback: {
+        successUrl: `${process.env.BASE_URL}/success`, // Configurar sua URL
+        autoRedirect: true
+      }
     });
 
     if (!paymentResponse.data?.id) {
-      throw new Error("Erro ao criar pagamento PIX: resposta inválida da API.");
+      throw new Error("Falha ao criar pagamento PIX");
     }
 
-    // Retorna os dados do checkout, incluindo a URL e QR code
+    // Retorna dados para o frontend
     res.json({
       paymentId: paymentResponse.data.id,
-      checkoutUrl: `https://www.asaas.com/v3/checkouts/${paymentResponse.data.id}`,  // URL para o checkout
-      qrCode: paymentResponse.data.pixQrCode,  // Código QR para pagamento
-      qrCodeImage: paymentResponse.data.pixQrCodeImage  // Imagem do código QR
+      checkoutUrl: paymentResponse.data.invoiceUrl,
+      qrCode: paymentResponse.data.pixQrCode,
+      qrCodeImage: paymentResponse.data.pixQrCodeImage,
+      payload: paymentResponse.data.pixPayload,
+      expirationDate: paymentResponse.data.expirationDate
     });
 
   } catch (error) {
-    console.error("Erro ao criar pagamento PIX:", error.response?.data || error.message);
-
-    // Logando o erro para entender melhor
-    console.log("Detalhes do erro:", error);
-
-    // Retorna um erro com detalhes no formato JSON
+    console.error("Erro:", error.response?.data || error.message);
     res.status(500).json({
-      error: "Erro ao criar pagamento PIX.",
+      error: "Erro ao processar pagamento",
       details: error.response?.data || error.message
     });
   }
 });
-
 module.exports = app;
