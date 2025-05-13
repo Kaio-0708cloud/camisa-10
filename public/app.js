@@ -20,10 +20,11 @@ const paymentModal = document.getElementById("payment-modal");
 const cancelPaymentBtn = document.getElementById("cancel-payment-btn");
 
 // Configurações
-const WHATSAPP_NUMBER = "5583986850268"; // Número no formato internacional
+const WHATSAPP_NUMBER = "5583986850268";
 const STRIPE_PUBLIC_KEY = "pk_live_51RLWZiDCgQUWVX4YKX1JwdhjHT8fJ74CXCereV5tdWRFRiwOUzYKJPVJhpouBrtZmOpAxbINCI9QqUaRIpgtCjX600zNEKPFNi";
 
 let cart = [];
+let selectedSize = null; // Armazena o tamanho selecionado
 
 // Abre o modal do carrinho
 cartBtn.addEventListener("click", function() {
@@ -43,6 +44,22 @@ closeModalBtn.addEventListener("click", function() {
   cartModal.style.display = "none";
 });
 
+// Seleciona o tamanho
+menu.addEventListener("click", function(event) {
+  if (event.target.classList.contains("size-btn")) {
+    // Remove a seleção anterior de todos os botões do mesmo produto
+    const sizeButtons = event.target.closest('.flex.justify-between').querySelectorAll('.size-btn');
+    sizeButtons.forEach(btn => {
+      btn.classList.remove("bg-[#d0904b]");
+      btn.classList.add("bg-black", "text-white");
+    });
+    
+    // Adiciona a cor #d0904b ao botão clicado
+    event.target.classList.remove("bg-black", "text-white");
+    event.target.classList.add("bg-[#d0904b]", "text-black");
+    selectedSize = event.target.getAttribute("data-size");
+  }
+});
 // Adiciona itens ao carrinho
 menu.addEventListener("click", function(event) {
   let parentButton = event.target.closest(".add-to-cart-btn");
@@ -56,17 +73,32 @@ menu.addEventListener("click", function(event) {
 
 // Funções do carrinho
 function addToCart(name, price) {
-  const existingItem = cart.find(item => item.name === name);
+  if (!selectedSize) {
+    alert("Por favor, selecione um tamanho");
+    return;
+  }
+
+  const nameWithSize = `${name} (${selectedSize})`;
+  const existingItem = cart.find(item => item.name === nameWithSize);
 
   if (existingItem) {
     existingItem.quantity += 1;
   } else {
     cart.push({
-      name,
+      name: nameWithSize,
       price,
       quantity: 1,
+      size: selectedSize
     });
   }
+  
+  // Resetar seleção de tamanho
+  document.querySelectorAll(".size-btn").forEach(btn => {
+    btn.classList.remove("bg-[#d0904b]", "text-black");
+    btn.classList.add("bg-gray-200");
+  });
+  selectedSize = null;
+  
   updateCartModal();
 }
 
@@ -77,11 +109,15 @@ function updateCartModal() {
   cart.forEach(item => {
     const cartItemElement = document.createElement("div");
     cartItemElement.classList.add("flex", "justify-between", "mb-4", "flex-col");
-        
+    
+    // Extrai o nome base (sem o tamanho)
+    const baseName = item.name.split(' (')[0];
+    
     cartItemElement.innerHTML = `
       <div class="flex items-center justify-between">
         <div>
-          <p class="font-bold">${item.name}</p>
+          <p class="font-bold">${baseName}</p>
+          <p>Tamanho: ${item.size}</p>
           <p>Qtd: ${item.quantity}</p>
           <p class="font-medium mt-2">R$ ${item.price.toFixed(2)}</p>
         </div>
@@ -103,25 +139,25 @@ function updateCartModal() {
 
 // Remove itens do carrinho
 cartItemsContainer.addEventListener("click", function(event) {
-    if (event.target.classList.contains("remove-from-cart-btn")) {
-        const name = event.target.getAttribute("data-name");
-        removeItemCart(name);
-    }
+  if (event.target.classList.contains("remove-from-cart-btn")) {
+    const name = event.target.getAttribute("data-name");
+    removeItemCart(name);
+  }
 });
 
 function removeItemCart(name) {
-    const index = cart.findIndex(item => item.name === name);
+  const index = cart.findIndex(item => item.name === name);
 
-    if (index !== -1) {
-        const item = cart[index];
+  if (index !== -1) {
+    const item = cart[index];
 
-        if (item.quantity > 1) {
-            item.quantity -= 1;
-        } else {
-            cart.splice(index, 1);
-        }
-        updateCartModal();
+    if (item.quantity > 1) {
+      item.quantity -= 1;
+    } else {
+      cart.splice(index, 1);
     }
+    updateCartModal();
+  }
 }
 
 // Validações dos campos
@@ -175,7 +211,7 @@ cancelPaymentBtn.addEventListener("click", function() {
   paymentModal.style.display = "none";
 });
 
-// Pagamento com Stripe (Cartão) - MANTIDO ORIGINAL
+// Pagamento com Stripe (Cartão)
 checkoutStripeBtn.addEventListener("click", async function () {
   if (cart.length === 0) return;
 
@@ -191,7 +227,8 @@ checkoutStripeBtn.addEventListener("click", async function () {
       cart: cart.map(item => ({
         name: item.name,
         price: item.price,
-        quantity: item.quantity
+        quantity: item.quantity,
+        size: item.size
       })),
       timestamp: new Date().getTime()
     };
@@ -248,66 +285,60 @@ checkoutStripeBtn.addEventListener("click", async function () {
   }
 });
 
-// NOVA FUNÇÃO PARA PAGAMENTO VIA PIX (substitui a do Asaas)
+// Pagamento com PIX
 checkoutPixBtn.addEventListener("click", function() {
   if (cart.length === 0) return;
 
-  // Validação dos campos
   if (!nameInput.value || !cpfInput.value || !addressInput.value || !emailInput.value) {
     alert("Por favor, preencha todos os campos obrigatórios");
     return;
   }
 
-  // Prepara os dados do pedido
   const orderData = {
     name: nameInput.value.trim(),
     cpf: cpfInput.value.trim().replace(/\D/g, ''),
     address: addressInput.value.trim(),
     email: emailInput.value.trim(),
     cart: cart.map(item => ({
-      name: item.name,
+      name: item.name.split(' (')[0], // Remove o tamanho do nome
       price: item.price,
-      quantity: item.quantity
+      quantity: item.quantity,
+      size: item.size
     })),
     timestamp: new Date().toLocaleString('pt-BR')
   };
 
-  // Valida CPF
   if (orderData.cpf.length < 11) {
     alert("CPF inválido");
     return;
   }
 
-  // Desabilita o botão temporariamente
   checkoutPixBtn.disabled = true;
   checkoutPixBtn.innerHTML = '<i class="fa fa-spinner fa-spin"></i> Preparando...';
 
-  // Armazena o pedido localmente (opcional)
   localStorage.setItem('pendingOrder', JSON.stringify(orderData));
   sessionStorage.setItem('pendingOrder', JSON.stringify(orderData));
 
-  // Envia direto para o WhatsApp
   sendToWhatsApp(orderData);
 
-  // Reseta o botão após 2 segundos (caso o WhatsApp não abra)
   setTimeout(() => {
     checkoutPixBtn.disabled = false;
     checkoutPixBtn.innerHTML = '<i class="fas fa-barcode"></i> Pagar com PIX';
   }, 2000);
 });
 
-// Função para enviar pedido para WhatsApp (ATUALIZADA)
+// Função para enviar pedido para WhatsApp
 function sendToWhatsApp(orderData) {
   try {
-    // Calcula o total
     const total = orderData.cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
     
-    // Formata os itens do pedido
     const itemsText = orderData.cart.map(item => 
-      `▪ ${item.name}\n   Quantidade: ${item.quantity}\n   Valor: R$ ${(item.price * item.quantity).toFixed(2)}\n`
+      `▪ ${item.name}
+   Tamanho: ${item.size}
+   Quantidade: ${item.quantity}
+   Valor: R$ ${(item.price * item.quantity).toFixed(2)}\n`
     ).join('\n');
 
-    // Mensagem mais completa para PIX
     const message = `*PEDIDO PARA PAGAMENTO VIA PIX* \n\n
 *DETALHES DO PEDIDO:*\n
 ${itemsText}\n
@@ -322,13 +353,9 @@ ${itemsText}\n
 3. Seu pedido será processado após confirmação do pagamento\n\n
 *Obrigado por comprar conosco!*`;
 
-    // Codifica a mensagem para URL
     const encodedMessage = encodeURIComponent(message);
-    
-    // Abre o WhatsApp
     window.open(`https://wa.me/${WHATSAPP_NUMBER}?text=${encodedMessage}`, "_blank");
     
-    // Limpa o carrinho após enviar
     cart = [];
     updateCartModal();
     paymentModal.style.display = "none";
@@ -341,7 +368,6 @@ ${itemsText}\n
   }
 }
 
-// Função para resetar botões de pagamento
 function resetPaymentButtons() {
   checkoutStripeBtn.disabled = false;
   checkoutStripeBtn.innerHTML = '<i class="fab fa-cc-stripe"></i> Pagar com Cartão';
@@ -353,7 +379,6 @@ function resetPaymentButtons() {
 window.addEventListener("load", function() {
   const urlParams = new URLSearchParams(window.location.search);
   
-  // Caso de cancelamento
   if (urlParams.get("payment") === "canceled") {
     const pendingOrder = JSON.parse(localStorage.getItem('pendingOrder') || sessionStorage.getItem('pendingOrder'));
     if (pendingOrder) {
