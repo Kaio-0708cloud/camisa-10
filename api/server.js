@@ -54,64 +54,6 @@ app.post("/api/create-checkout-session", async (req, res) => {
     res.status(500).json({ error: "Erro ao criar sessão" });
   }
 });
-/*
-app.post("/api/create-asaas-pix-checkout", async (req, res) => {
-  const { items, email } = req.body;
-
-  try {
-    const total = items.reduce((sum, item) => sum + (item.price * item.quantity), 0);
-
-    const customerResponse = await asaasClient.post("/customers", {
-      name: email.split("@")[0],
-      email: email
-    });
-
-    if (!customerResponse.data?.id) {
-      throw new Error("ID do cliente não retornado pela API do Asaas.");
-    }
-
-    const customerId = customerResponse.data.id;
-
-    const dueDate = new Date();
-    dueDate.setDate(dueDate.getDate() + 1);
-    const dueDateString = dueDate.toISOString().split("T")[0];
-
-    const paymentResponse = await asaasClient.post("/payments", {
-      billingType: "PIX",
-      customer: customerId,
-      value: total,
-      dueDate: dueDateString,
-      description: `Pedido de ${items.map((i) => i.name).join(", ")}`,
-      externalReference: `pedido-${Date.now()}`,
-      notificationDisabled: false,
-      autoRedirect: false
-    });
-
-    if (!paymentResponse.data?.id) {
-      throw new Error("Erro ao criar pagamento PIX: resposta inválida da API.");
-    }
-
-    res.json({
-      paymentId: paymentResponse.data.id,
-      checkoutUrl: `https://www.asaas.com/v3/checkouts/${paymentResponse.data.id}`,
-      qrCode: paymentResponse.data.pixQrCode,
-      qrCodeImage: paymentResponse.data.pixQrCodeImage
-    });
-
-  } catch (error) {
-    console.error("Erro ao criar pagamento PIX:", error.response?.data || error.message);
-    
-    // Logando o erro para entender melhor
-    console.log("Detalhes do erro:", error);
-
-    // Retorna um erro com detalhes no formato JSON
-    res.status(500).json({
-      error: "Erro ao criar pagamento PIX.",
-      details: error.response?.data || error.message
-    });
-  }
-});
-*/
 
 app.post("/api/create-asaas-pix-checkout", async (req, res) => {
   const { items, customer } = req.body;

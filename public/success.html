@@ -1,46 +1,146 @@
 <!DOCTYPE html>
-<html lang="pt">
+<html>
 <head>
-  <meta charset="UTF-8">
-  <title>Pagamento Concluído</title>
+  <title>Pagamento Aprovado</title>
+  <script src="https://js.stripe.com/v3/"></script>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
   <style>
     body {
-      margin: 0;
-      height: 100vh;
-      display: flex;
-      align-items: center;
-      justify-content: center;
       font-family: Arial, sans-serif;
-      background-color: #f2f2f2;
+      text-align: center;
+      padding: 20px;
+      background-color: #f5f5f5;
     }
     .container {
-      text-align: center;
+      max-width: 500px;
+      margin: 50px auto;
+      background: white;
+      padding: 30px;
+      border-radius: 10px;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.1);
     }
-    h1 {
-      color: green;
-      font-size: 2rem;
-      margin-bottom: 1rem;
+    .success-icon {
+      color: #25D366;
+      font-size: 50px;
+      margin-bottom: 20px;
     }
-    p {
-      margin-bottom: 1.5rem;
-    }
-    a {
-      text-decoration: none;
-      background-color: green;
+    .btn {
+      background: #25D366;
       color: white;
-      padding: 10px 20px;
+      border: none;
+      padding: 12px 24px;
       border-radius: 5px;
+      font-size: 16px;
+      cursor: pointer;
+      margin-top: 20px;
+      text-decoration: none;
+      display: inline-block;
     }
-    a:hover {
-      background-color: darkgreen;
+    .countdown {
+      margin: 20px 0;
+      font-size: 18px;
+      color: #666;
     }
   </style>
 </head>
 <body>
   <div class="container">
-    <h1>✅ Pagamento realizado com sucesso!</h1>
-    <p>Seu pagamento foi concluído. Obrigado!</p>
-    <a href=".../index.html">Voltar ao site</a>
+    <div class="success-icon">
+      <i class="fas fa-check-circle"></i>
+    </div>
+    <h1>Pagamento Aprovado!</h1>
+    <p>Seu pedido foi confirmado com sucesso.</p>
+    
+    <div class="countdown">
+      Redirecionando para o WhatsApp em <span id="count">5</span> segundos...
+    </div>
+    
+    <p>Ou clique no botão abaixo para ir agora:</p>
+    
+    <button id="whatsappBtn" class="btn">
+      <i class="fab fa-whatsapp"></i> Ir para WhatsApp Agora
+    </button>
   </div>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', async () => {
+      const whatsappBtn = document.getElementById('whatsappBtn');
+      const countElement = document.getElementById('count');
+      let count = 5;
+      
+      // Função para redirecionar
+     const redirectToWhatsApp = () => {
+  const orderData = JSON.parse(localStorage.getItem('pendingOrder') || sessionStorage.getItem('pendingOrder'));
+  
+  if (orderData) {
+    const total = orderData.cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+    
+    const itemsText = orderData.cart.map(item => 
+      `▪ ${item.name} 
+       Quantidade: ${item.quantity} 
+       Valor: R$ ${(item.price * item.quantity).toFixed(2)}\n`
+    ).join('\n');
+
+    const message = `*DETALHES DO PEDIDO* 
+
+*ITENS:*
+${itemsText}
+
+*VALOR TOTAL:* R$ ${total.toFixed(2)}
+
+*DADOS DO CLIENTE:*
+• Nome: ${orderData.name}
+• Endereço: ${orderData.address}
+• E-mail: ${orderData.email}
+
+⏱ *DATA/HORA:* ${new Date().toLocaleString('pt-BR')}
+
+*OBRIGADO PELO PEDIDO!*
+*QUALQUER DÚVIDA, ESTAMOS À DISPOSIÇÃO!*`;
+
+    const encodedMessage = encodeURIComponent(message);
+    window.location.href = `https://wa.me/5583986850268?text=${encodedMessage}`;
+  } else {
+    window.location.href = `${window.location.origin}/?payment=error`;
+  }
+};
+      
+      // Configura o contador
+      const timer = setInterval(() => {
+        count--;
+        countElement.textContent = count;
+        
+        if (count <= 0) {
+          clearInterval(timer);
+          redirectToWhatsApp();
+        }
+      }, 1000);
+      
+      // Configura o botão manual
+      whatsappBtn.addEventListener('click', () => {
+        clearInterval(timer);
+        redirectToWhatsApp();
+      });
+      
+      try {
+        // Verificação adicional com Stripe
+        const stripe = Stripe('pk_live_51RLWZiDCgQUWVX4YKX1JwdhjHT8fJ74CXCereV5tdWRFRiwOUzYKJPVJhpouBrtZmOpAxbINCI9QqUaRIpgtCjX600zNEKPFNi');
+        const urlParams = new URLSearchParams(window.location.search);
+        const sessionId = urlParams.get('session_id');
+        
+        if (sessionId) {
+          const { paymentIntent } = await stripe.retrievePaymentIntent(sessionId);
+          
+          if (paymentIntent.status !== 'succeeded') {
+            throw new Error("Pagamento não foi confirmado");
+          }
+        }
+      } catch (error) {
+        console.error("Erro na verificação:", error);
+        window.location.href = `${window.location.origin}/?payment=error`;
+      }
+    });
+  </script>
 </body>
 </html>

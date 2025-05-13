@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
+    <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/toastify-js/src/toastify.min.css"/>
+    <link rel="preconnect" href="https://fonts.googleapis.com"/>
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@200..700&family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap" rel="stylesheet"/>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" integrity="sha512-Fo3rlrZj/k7ujTnHg4CGR2D7kSs0v4LLanw2qksYuRlEzO+tcaEPQogQ0KaoGN26/zrn20ImR1DfuLWnOo7aBA==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <meta property="og:title" content="Manu Ateliê- Excelente qualidade!"/>
+    <meta property="og:image" content=""/>
+    <meta property="og:description" content="Excelente qualidade!" />
+    <meta property="og:site_name" content="Vi Burguer" /> 
+    <script src="https://js.stripe.com/v3/"></script>
+   
+    <link rel="stylesheet" href="./Styles/output.css"/>
+
+    <title>Manu Ateliê - Mais que costura, é arte de excelência</title>
+</head>
+<body style="background-color: #d3a826">
+    <!---<header class="w-full h-[420px] bg-zinc-900 bg-cover bg-center bg-black">-->
+    <header class="w-full h-[420px] bg-zinc-900 bg-cover bg-center" style="background-image: linear-gradient(rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0.1)), url('./Assets/atelie2.png');"> 
+        <div class="w-full h-full flex flex-col justify-center items-center">
+            <img
+                src="./Assets/Manu Ateliê.png"
+                alt="Logo Manu Ateliê"
+                class="w-32 h-32 rounded-full shadow-lg hover:scale-100 duration-200"
+            >
+            <h1 class="text-3xl mt-4 mb-2 font-bold text-white" style="color: #d0904b;">Manu <span style="color: #d3a826;">Ateliê</span></h1>
+
+            <div style="background-color: #d3a826;" class="px-4 py-1 rounded-lg mt-4" id="date-span">
+                <span class="text-black font-medium">
+                    Mais que costura, é arte de excelência!
+                </span>
+            </div>            
+           <!--<div style="background-color: #d3a826;" class="px-4 py-1 rounded-lg mt-4" id="date-span">
+                <span class="text-black font-medium">
+                    R. Semeão Leal, 159 - Centro, Campina Grande - PB. 
+                </span>
+            </div>-->
+           <div class="flex flex-wrap justify-center gap-2 mt-4">
+    <!-- Botão Home (página principal) -->
+    <a href="index.html" style="background-color: #d3a826;" class="px-4 py-1 rounded-lg hover:bg-amber-500 transition-colors duration-300" id="home-btn">
+        <span class="text-black font-medium">Home</span>
+    </a>
+    
+    <!-- Botão Sobre -->
+    <a href="sobre.html" style="background-color: #d3a826;" class="px-4 py-1 rounded-lg hover:bg-amber-500 transition-colors duration-300" id="sobre-btn">
+        <span class="text-black font-medium">Sobre</span>
+    </a>
+    
+    <!-- Botão Orçamento -->
+    <a href="orcamento.html" style="background-color: #d3a826;" class="px-4 py-1 rounded-lg hover:bg-amber-500 transition-colors duration-300" id="orcamento-btn">
+        <span class="text-black font-medium">Orçamento</span>
+    </a>
+    
+    <!-- Botão Endereço -->
+    <a href="endereco.html" style="background-color: #d3a826;" class="px-4 py-1 rounded-lg hover:bg-amber-500 transition-colors duration-300" id="localizacao-btn">
+        <span class="text-black font-medium">Endereço</span>
+    </a>
+</div>
+        </div>
+    </header>
+
+    <h2 class="text-2xl md:text-3xl text-center mt-9 mb-6">
+        Bem-vindo à Manu Ateliê – Mais que costura, é arte de excelência!
+    </h2>
+
+    <section class="max-w-4xl mx-auto px-4 text-justify text-lg leading-relaxed text-black mb-12">
+    <p>Somos a <strong>Manu Ateliê</strong>, uma loja com <strong>mais de 20 anos de história</strong> e muito amor pela arte de vestir bem. Tudo começou de forma simples, no quarto de uma casa em Campina Grande, na Paraíba. Com dedicação e talento, crescemos e conquistamos nosso espaço em um ponto comercial no centro da cidade, onde hoje atendemos com ainda mais carinho e profissionalismo.</p>
+    <br/>
+    <p>Nossa especialidade vai muito além da costura:</p>
+    <ul class="list-disc pl-6 mt-2">
+        <li>✨ Realizamos <strong>consertos de roupas</strong> com acabamento impecável.</li>
+        <li>👕 Produzimos <strong>fardamentos personalizados</strong> para escolas, empresas e eventos.</li>
+        <li>🎨 Criamos <strong>camisetas únicas e criativas</strong>, com a sua cara.</li>
+        <li>🧥 E, claro, temos uma <strong>variedade de vestuário à venda</strong>, sempre alinhada com as tendências.</li>
+    </ul>
+    <br/>
+    <p>Somos movidos pela moda e pelo desejo de valorizar cada estilo, cada corpo e cada história. Se você busca qualidade, atendimento próximo e peças feitas com alma, a <strong>Manu Ateliê</strong> é o seu lugar!</p>
+    <br/>
+    <p><strong>Moda com identidade, feita para você.</strong></p>
+</section>
+
+<a href="https://wa.me/5583986850268" class="whatsapp-float" target="_blank" style="
+    position: fixed;
+    width: 60px;
+    height: 60px;
+    bottom: 100px;  
+    right: 20px;    
+    background-color: #25d366;
+    color: white;
+    border-radius: 50%;
+    text-align: center;
+    font-size: 35px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+    z-index: 100;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.3s ease;
+">
+    <i class="fab fa-whatsapp"></i>
+</a>
+<br>
+<br>
+  <footer>
+        <div class="container mx-auto">
+            <p class="text-center">© 2025 Manu Ateliê. Todos os direitos reservados.</p>
+        </div>
+    </footer>
+<script type="text/javascript" src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
+<script src="app.js"></script>
+</body>
+</html>
+
