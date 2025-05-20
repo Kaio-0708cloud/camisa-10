@@ -1,7 +1,7 @@
 {
-  "name": "Ateliê",
+  "name": "Camisa10",
   "version": "1.0.0",
-  "description": "hManu Ateliê",
+  "description": "Camisa 10",
   "main": "server.js",
   "scripts": {
     "dev": "npx tailwindcss -i ./Styles/style.css -o ./Styles/output.css --watch",
