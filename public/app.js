@@ -20,7 +20,7 @@ const paymentModal = document.getElementById("payment-modal");
 const cancelPaymentBtn = document.getElementById("cancel-payment-btn");
 
 // Configurações
-const WHATSAPP_NUMBER = "5583986850268";
+const WHATSAPP_NUMBER = "5583996191523";
 const STRIPE_PUBLIC_KEY = "pk_live_51RLWZiDCgQUWVX4YKX1JwdhjHT8fJ74CXCereV5tdWRFRiwOUzYKJPVJhpouBrtZmOpAxbINCI9QqUaRIpgtCjX600zNEKPFNi";
 
 let cart = [];
@@ -310,7 +310,7 @@ ${itemsText}\n
 • Endereço: ${orderData.address}\n
 • E-mail: ${orderData.email}\n\n
 *INSTRUÇÕES PARA PAGAMENTO:*\n
-1. Efetue o pagamento via PIX para a chave: (83986850268)\n
+1. Efetue o pagamento via PIX para a chave: (83996191523)\n
 2. Envie o comprovante como resposta a esta mensagem\n
 3. Seu pedido será processado após confirmação do pagamento\n\n
 *Obrigado por comprar conosco!*`;
