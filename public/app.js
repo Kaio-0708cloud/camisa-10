@@ -21,7 +21,7 @@ const cancelPaymentBtn = document.getElementById("cancel-payment-btn");
 
 // Configurações
 const WHATSAPP_NUMBER = "5583996191523";
-const STRIPE_PUBLIC_KEY = "pk_live_51RLWZiDCgQUWVX4YKX1JwdhjHT8fJ74CXCereV5tdWRFRiwOUzYKJPVJhpouBrtZmOpAxbINCI9QqUaRIpgtCjX600zNEKPFNi";
+const STRIPE_PUBLIC_KEY = "pk_live_51RRDCwFfQV9fEcKQSlfVU0QmWc0qNCu9rWrv0snTdD4jd87IcX0PSiRwfxwwtFlIV2eGvfoo3rslXVvkB5NnMCak00vBvfOgJ4";
 
 let cart = [];
 
