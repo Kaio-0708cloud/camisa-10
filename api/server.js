@@ -36,8 +36,8 @@ app.post("/api/create-checkout-session", async (req, res) => {
       payment_method_types: ['card'],
       mode: 'payment',
       line_items: lineItems,
-      success_url: 'https://atelie-manu.vercel.app/success.html',
-      cancel_url: 'https://atelie-manu.vercel.app/cancel.html',
+      success_url: 'https://camisa-10.vercel.app/success.html',
+      cancel_url: 'https://camisa-10.vercel.app/cancel.html',
     });
 
     res.json({ id: session.id });
